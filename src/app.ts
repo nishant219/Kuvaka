@@ -23,11 +23,11 @@ app.use('/api', routes);
 // Error handler
 app.use(errorHandler);
 
-// Start server (only in non-serverless environments)
+// Start server
 const startServer = async () => {
   try {
     await connectDatabase();
-
+    
     app.listen(config.port, () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
     });
@@ -37,14 +37,6 @@ const startServer = async () => {
   }
 };
 
-// Only start server if not in Vercel serverless environment
-if (process.env.VERCEL !== '1') {
-  startServer();
-} else {
-  // Initialize database connection for serverless
-  connectDatabase().catch((error) => {
-    logger.error('Failed to connect to database:', error);
-  });
-}
+startServer();
 
 export default app;
