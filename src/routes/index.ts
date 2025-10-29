@@ -13,14 +13,13 @@ router.get('/health', (req, res) => {
 });
 
 // Offer routes
-router.post('/offer', authenticate, offerController.createOffer);
-router.get('/offers', authenticate, offerController.getOffers);
-router.get('/offer/:id', authenticate, offerController.getOffer);
+router.post('/offer', offerController.createOffer);
+router.get('/offers', offerController.getOffers);
+router.get('/offer/:id', offerController.getOffer);
 
 // Lead upload routes
 router.post(
   '/leads/upload',
-  authenticate,
   upload.single('file'),
   leadController.uploadLeads
 );
@@ -28,14 +27,13 @@ router.post(
 // Scoring routes
 router.post(
   '/score',
-  authenticate,
   upload.single('file'),
   scoreController.scoreLeads
 );
-router.get('/score/:batchId/status', authenticate, scoreController.getScoreStatus);
+router.get('/score/:batchId/status', scoreController.getScoreStatus);
 
 // Results routes
-router.get('/results', authenticate, leadController.getResults);
-router.get('/results/export', authenticate, leadController.exportResults);
+router.get('/results', leadController.getResults);
+router.get('/results/export', leadController.exportResults);
 
 export default router;
