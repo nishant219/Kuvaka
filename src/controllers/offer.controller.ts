@@ -1,16 +1,17 @@
-import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth.middleware';
+import { Request, Response } from 'express';
 import { Offer } from '../models/offer.model';
 import { validateOffer } from '../utils/validators';
 import { asyncHandler } from '../middleware/error.middleware';
 
+const DEFAULT_USER_ID = 'default-user';
+
 export const createOffer = asyncHandler(
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     validateOffer(req.body);
 
     const offer = new Offer({
       ...req.body,
-      userId: req.userId,
+      userId: DEFAULT_USER_ID,
     });
 
     await offer.save();
@@ -23,8 +24,8 @@ export const createOffer = asyncHandler(
 );
 
 export const getOffers = asyncHandler(
-  async (req: AuthRequest, res: Response): Promise<void> => {
-    const offers = await Offer.find({ userId: req.userId }).sort({ createdAt: -1 });
+  async (req: Request, res: Response): Promise<void> => {
+    const offers = await Offer.find({ userId: DEFAULT_USER_ID }).sort({ createdAt: -1 });
 
     res.json({
       success: true,
@@ -35,10 +36,10 @@ export const getOffers = asyncHandler(
 );
 
 export const getOffer = asyncHandler(
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     const offer = await Offer.findOne({
       _id: req.params.id,
-      userId: req.userId,
+      userId: DEFAULT_USER_ID,
     });
 
     if (!offer) {

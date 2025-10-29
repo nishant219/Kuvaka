@@ -1,6 +1,5 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { ScoringService } from '../services/scoring.service';
 import { CSVService } from '../services/csv.service';
 import { Offer } from '../models/offer.model';
@@ -11,9 +10,10 @@ import { IOffer } from '../types';
 
 const scoringService = new ScoringService();
 const csvService = new CSVService();
+const DEFAULT_USER_ID = 'default-user';
 
 export const scoreLeads = asyncHandler(
-    async (req: AuthRequest, res: Response): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
         const { offerId, leads: leadsData } = req.body;
 
         if (!offerId) {
@@ -23,7 +23,7 @@ export const scoreLeads = asyncHandler(
         // Fetch offer
         const offer = await Offer.findOne({
             _id: offerId,
-            userId: req.userId,
+            userId: DEFAULT_USER_ID,
         });
 
         if (!offer) {
@@ -60,7 +60,7 @@ export const scoreLeads = asyncHandler(
             // Save results to database
             const leadDocuments = results.map(result => ({
                 ...result,
-                userId: req.userId,
+                userId: DEFAULT_USER_ID,
                 offerId: offer._id,
                 batchId,
             }));
@@ -81,11 +81,11 @@ export const scoreLeads = asyncHandler(
 );
 
 export const getScoreStatus = asyncHandler(
-    async (req: AuthRequest, res: Response): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
         const { batchId } = req.params;
 
         const count = await Lead.countDocuments({
-            userId: req.userId,
+            userId: DEFAULT_USER_ID,
             batchId,
         });
 

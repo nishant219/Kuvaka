@@ -1,14 +1,14 @@
-import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth.middleware';
+import { Request, Response } from 'express';
 import { CSVService } from '../services/csv.service';
 import { Lead } from '../models/lead.model';
 import { asyncHandler, AppError } from '../middleware/error.middleware';
 import { config } from '../config/env';
 
 const csvService = new CSVService();
+const DEFAULT_USER_ID = 'default-user';
 
 export const uploadLeads = asyncHandler(
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     if (!req.file) {
       throw new AppError('CSV file is required', 400);
     }
@@ -36,10 +36,10 @@ export const uploadLeads = asyncHandler(
 );
 
 export const getResults = asyncHandler(
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     const { batchId, offerId, intent } = req.query;
 
-    const filter: any = { userId: req.userId };
+    const filter: any = { userId: DEFAULT_USER_ID };
 
     if (batchId) filter.batchId = batchId;
     if (offerId) filter.offerId = offerId;
@@ -58,7 +58,7 @@ export const getResults = asyncHandler(
 );
 
 export const exportResults = asyncHandler(
-  async (req: AuthRequest, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     const { batchId } = req.query;
 
     if (!batchId) {
@@ -66,7 +66,7 @@ export const exportResults = asyncHandler(
     }
 
     const results = await Lead.find({
-      userId: req.userId,
+      userId: DEFAULT_USER_ID,
       batchId: batchId as string,
     })
       .sort({ score: -1 })
