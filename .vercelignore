@@ -9,3 +9,4 @@ tests
 README.md
 nodemon.json
 jest.config.js
+.DS_Store
